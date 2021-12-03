@@ -20,7 +20,7 @@ module FPGA_CLOCK
         wire [2:0] current_time_clk;
         wire [2:0] beep_time_clk;
         wire mode;
-        wire should_beep;
+        wire beep;
         wire beep_button_posedge;
         wire set_button_posedge;
         wire add_button_posedge;
@@ -36,11 +36,11 @@ module FPGA_CLOCK
         wire flash_second;
 
         reg [6:0] control_status;
-        reg beep_button_rawlatch;
+        reg beep_enabled;
 
         initial begin
                 control_status <= 7'b000_000_1;
-                beep_button_rawlatch <= 0;
+                beep_enabled <= 1'b0;
         end
 
         TIMER #(.cycle(32'd50_000_000)) timer_1s (.clk(clk), .rst(rst), .cy(clk_1s));
@@ -69,7 +69,7 @@ module FPGA_CLOCK
                         .seg_data_5(seg_data_5)
                 );
 
-        BEEP_CONTROLLER beep_controller (.clk(square_wave), .rst(rst), .beep(should_beep), .beep_port(beep_port));
+        BEEP_CONTROLLER beep_controller (.clk(square_wave), .rst(rst), .beep(beep), .beep_enabled(beep_enabled), .beep_port(beep_port));
 
         AX_DEBOUNCE ax_debounce_beep_button
                 (
@@ -113,14 +113,14 @@ module FPGA_CLOCK
         end
 
         always @(posedge beep_button_posedge or negedge rst) begin
-                if (rst == 0) begin
-                        beep_button_rawlatch <= 0;
+                if (rst == 1'b0) begin
+                        beep_enabled <= 1'b0;
                 end else begin
-                        beep_button_rawlatch <= ~beep_button_rawlatch;
+                        beep_enabled <= ~beep_enabled;
                 end
         end
 
-        assign led_beep_enabled_port = beep_button_rawlatch;
+        assign led_beep_enabled_port = beep_enabled;
         assign current_time_clk[2] = control_status[3] & add_button_posedge;
         assign current_time_clk[1] = control_status[2] & add_button_posedge;
         assign current_time_clk[0] = (control_status[1] & add_button_posedge) | (control_status[0] & clk_1s);
@@ -130,7 +130,7 @@ module FPGA_CLOCK
         assign control_status_next = (control_status == 7'b100_000_0) ? 7'b000_000_1 : (control_status << 1);
         assign mode = control_status[0];
         assign time_data = (control_status[6] | control_status[5] | control_status[4]) ? beep_time_data : current_time_data;
-        assign should_beep = ((beep_time_data == current_time_data) & beep_button_rawlatch & control_status[0]) ? 1'b1 : 1'b0;
+        assign beep = (beep_time_data == current_time_data) & control_status[0];
         assign flash_second = control_status[1] | control_status[4];
         assign flash_minute = control_status[2] | control_status[5];
         assign flash_hour = control_status[3] | control_status[6];
@@ -336,21 +336,42 @@ module BEEP_CONTROLLER
                 input clk,
                 input rst,
                 input beep,
+                input beep_enabled,
                 output reg beep_port
         );
+
+        reg beep_latch;
+        wire beep_latch_next;
+
+        assign beep_latch_next = beep | beep_latch;
+
         initial begin
                 beep_port <= 1'b1;
+                beep_latch <= 1'b0;
         end
 
         always @(posedge clk or negedge rst) begin
-                if (rst == 1'b0) begin
+                if (rst == 0) begin
                         beep_port <= 1'b1;
-                end else if (beep == 1'b1) begin
-                        beep_port <= ~beep_port;
+                end else if (beep_enabled == 1'b0) begin
+                        beep_port <= 1'b1;
+                end else if (beep_latch == 1'b0) begin
+                        beep_port <= 1'b1;
                 end else begin
-                        beep_port <= 1'b1;
+                        beep_port <= ~beep_port;
                 end
         end
+
+        always @(posedge clk or negedge rst) begin
+                if (rst == 0) begin
+                        beep_latch <= 1'b0;
+                end else if (beep_enabled == 0) begin
+                        beep_latch <= 1'b0;
+                end else begin
+                        beep_latch <= beep_latch_next;
+                end
+        end
+
 endmodule
 
 module SEG_DECODER
