@@ -1,4 +1,4 @@
-module AX_DEBOUNCE 
+module AX_DEBOUNCE
         (
                 input clk,
                 input rst,
@@ -21,8 +21,8 @@ module AX_DEBOUNCE
         // contenious assignment for counter control
         assign q_reset = (DFF1  ^ DFF2);          // xor input flip flops to look for level chage to reset counter
         assign q_add = ~(q_reg == TIMER_MAX_VAL); // add to counter when q_reg msb is equal to 0
-    
-        // combo counter to manage q_next 
+
+        // combo counter to manage q_next
         always @(q_reset, q_add, q_reg) begin
                 case({q_reset , q_add})
                 2'b00:

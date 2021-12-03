@@ -61,7 +61,7 @@
 **/incremental_db/
 **/simulation/
 **/timing/
-**/testbench/
+# **/testbench/
 **/*_sim/
 **/incremental_db/
 **/output_files/

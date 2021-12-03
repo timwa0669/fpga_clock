@@ -1,11 +1,3 @@
-`include "SEG.v"
-`include "AX_DEBOUNCE.v"
-`include "SQUARE_WAVE_GENERATOR.v"
-`include "TIME_MODULE.v"
-`include "TIMER.v"
-`include "BEEP.v"
-
-
 module FPGA_CLOCK
 (       
         input clk,
