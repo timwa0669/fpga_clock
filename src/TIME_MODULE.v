@@ -16,7 +16,7 @@ module TIME_MODULE
                         .clk(cy_controller[0]),
                         .rst(rst),
                         .cy(cy[0]),
-                        .TIME_SEG_UNIT(time_data[3-:4])
+                        .time_data(time_data[3-:4])
                 );
         TIME_SEG_UNIT
                 #(
@@ -27,7 +27,7 @@ module TIME_MODULE
                         .clk(cy[0]),
                         .rst(rst),
                         .cy(cy[1]),
-                        .TIME_SEG_UNIT(time_data[7-:4])
+                        .time_data(time_data[7-:4])
                 );
         TIME_SEG_UNIT
                 minute_l
@@ -35,7 +35,7 @@ module TIME_MODULE
                         .clk(cy_controller[1]),
                         .rst(rst),
                         .cy(cy[2]),
-                        .TIME_SEG_UNIT(time_data[11-:4])
+                        .time_data(time_data[11-:4])
                 );
         TIME_SEG_UNIT
                 #(
@@ -46,7 +46,7 @@ module TIME_MODULE
                         .clk(cy[2]),
                         .rst(rst),
                         .cy(cy[3]),
-                        .TIME_SEG_UNIT(time_data[15-:4])
+                        .time_data(time_data[15-:4])
                 );
         TIME_SEG_UNIT
                 #(
@@ -58,7 +58,7 @@ module TIME_MODULE
                         .clk(cy_controller[2]),
                         .rst(rst),
                         .cy(cy[4]),
-                        .TIME_SEG_UNIT(time_data[19-:4])
+                        .time_data(time_data[19-:4])
                 );
         TIME_SEG_UNIT
                 #(
@@ -68,7 +68,7 @@ module TIME_MODULE
                 (
                         .clk(cy[4]),
                         .rst(rst),
-                        .TIME_SEG_UNIT(time_data[23-:4])
+                        .time_data(time_data[23-:4])
                 );
 endmodule
 
@@ -81,7 +81,7 @@ module TIME_SEG_UNIT
                 input clk,
                 input rst,
                 output reg cy,
-                output reg [3:0] TIME_SEG_UNIT
+                output reg [3:0] time_data
         );
 
         wire [3:0] time_next;
@@ -92,21 +92,21 @@ module TIME_SEG_UNIT
 
         initial begin
                 cy_count <= 4'd0;
-                TIME_SEG_UNIT <= 4'h0;
+                time_data <= 4'h0;
                 cy <= 1'b0;
         end
 
         assign cy_is_enough = (cy_count == target_cy_count) ? 1'b1 : 1'b0;
         assign target_max = cy_is_enough ? target_cy_num : 4'h9;
         assign cy_count_next = cy_is_enough ? 4'd0 : cy_count + 4'd1;
-        assign time_next = (TIME_SEG_UNIT == target_max) ? 4'b0 : TIME_SEG_UNIT + 4'b1;
+        assign time_next = (time_data == target_max) ? 4'b0 : time_data + 4'b1;
 
         always @(posedge clk or negedge rst) begin
                 if (rst == 1'b0) begin
-                        TIME_SEG_UNIT <= 4'h0;
+                        time_data <= 4'h0;
                         cy <= 1'b0;
                 end else begin
-                        TIME_SEG_UNIT <= time_next;
+                        time_data <= time_next;
                         cy <= (time_next == 4'b0) ? 1'b1 : 1'b0;
                 end
         end

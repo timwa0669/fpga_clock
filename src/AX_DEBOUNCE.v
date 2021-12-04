@@ -18,6 +18,16 @@ module AX_DEBOUNCE
         wire q_reset;
         reg button_out_d0;
 
+        initial begin
+                q_reg <= { N {1'b0} };
+                DFF1 <= 1'b0;
+                DFF2 <= 1'b0;
+                button_out <= 1'b1;
+                button_out_d0 <= 1'b1;
+                button_posedge <= 1'b0;
+                button_negedge <= 1'b0;
+        end
+
         // contenious assignment for counter control
         assign q_reset = (DFF1  ^ DFF2);          // xor input flip flops to look for level chage to reset counter
         assign q_add = ~(q_reg == TIMER_MAX_VAL); // add to counter when q_reg msb is equal to 0

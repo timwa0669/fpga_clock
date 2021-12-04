@@ -66,7 +66,7 @@
 **/incremental_db/
 **/output_files/
 PLLJ_PLLSPE_INFO.txt
-
+*_description.txt
 
 # macOS.gitignore
 # General
