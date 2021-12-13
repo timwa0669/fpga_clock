@@ -1,7 +1,7 @@
-module TIMER
+module TIMER                                    // 分频器
         #(
-                parameter [31:0] cycle,
-                parameter [31:0] rel = 32'd0
+                parameter [31:0] cycle,         // 分频次数
+                parameter [31:0] rel = 32'd0    // 初始分频偏移数
         )
         (
                 input clk,

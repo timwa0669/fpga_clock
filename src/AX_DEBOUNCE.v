@@ -1,4 +1,4 @@
-module AX_DEBOUNCE
+module AX_DEBOUNCE                   // 按键消抖
         (
                 input clk,
                 input rst,

@@ -2,12 +2,12 @@ module BEEP_CONTROLLER
         (
                 input clk,
                 input rst,
-                input beep,
-                input beep_enabled,
-                output reg beep_port
+                input beep,             // 响铃触发信号
+                input beep_enabled,     // 响铃总开关
+                output reg beep_port    // 蜂鸣器输出端口
         );
 
-        reg beep_latch;
+        reg beep_latch;                 // 响铃触发信号锁存器
         wire beep_latch_next;
 
         assign beep_latch_next = beep | beep_latch;

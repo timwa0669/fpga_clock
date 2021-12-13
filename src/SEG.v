@@ -1,12 +1,14 @@
 module FLASH_SEG
         (
-                input flash_clk,
-                input flash,
+                input flash_clk,		// 闪烁信号源：控制闪烁占空比，闪烁频率
+                input flash,			// 闪烁总开关
+						// 1: 启用闪烁
+						// 0: 不闪烁
                 input [7:0] time_seg_data_in,
                 output [7:0] time_seg_data_out
         );
 
-        assign time_seg_data_out = flash_clk & flash ? { 8{flash_clk} } : time_seg_data_in;
+        assign time_seg_data_out = flash_clk & flash ? 8'b1111_1111 : time_seg_data_in;
 endmodule
 
 

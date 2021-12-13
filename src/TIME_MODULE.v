@@ -8,6 +8,10 @@ module TIME_MODULE
         wire [5:0] cy;
         wire [2:0] cy_controller;
 
+        // mode
+        // 模0：禁止秒→分，分→时进位
+        // 模1：允许所有进位
+
         assign cy_controller = {clk[2] | (mode & cy[3]), clk[1] | (mode & cy[1]), clk[0]};
 
         TIME_SEG_UNIT
@@ -74,8 +78,8 @@ endmodule
 
 module TIME_SEG_UNIT
         #(
-                parameter [3:0] target_cy_count = 4'd0,
-                parameter [3:0] target_cy_num = 4'h9
+                parameter [3:0] target_cy_count = 4'd0, // 经过target_cy_count次前，进位数字是9，不是target_cy_num
+                parameter [3:0] target_cy_num = 4'h9    // 进位数字
         )
         (
                 input clk,
